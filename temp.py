@@ -1,4 +1,4 @@
-# Copyright (c) 2009-2015 Tom Keffer <tkeffer@gmail.com>
+# Copyright (c) 2016 RAMPBA
 #
 #    See the file LICENSE.txt for your full rights.
 #
@@ -215,4 +215,4 @@ if __name__ == '__main__':
     event = weewx.Event(weewx.NEW_ARCHIVE_RECORD, record=rec)
     alarm.newArchiveRecord(event)
     
-
+    
