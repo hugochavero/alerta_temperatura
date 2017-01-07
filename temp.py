@@ -1,6 +1,6 @@
 # Copyright (c) 2016 RAMPBA
 #
-#    See the file LICENSE.txt for your full rights.
+#    Vea el archivo LICENSE.txt para comprender sus derechos.
 #
 """Ejemplo de como implementar una alarma en weewx. 
 
