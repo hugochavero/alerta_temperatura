@@ -2,12 +2,11 @@
 #
 #    See the file LICENSE.txt for your full rights.
 #
-"""Example of how to implement an alarm in weewx. 
+"""Ejemplo de como implementar una alarma en weewx. 
 
 ********************************************************************************
 
-To use this alarm, add the following somewhere in your configuration file
-weewx.conf:
+Para usar esta alarma, agregue el siguiente código en su archivo de configuración weewx.conf:
 
 [Alarm]
   expression = "outTemp < 40.0"
@@ -19,25 +18,25 @@ weewx.conf:
   from = me@mydomain.com
   subject = "Alarm message from weewx!"
   
-In this example, if the outside temperature falls below 40, it will send an
-email to the the comma separated list specified in option "mailto", in this case
+En este ejemplo, si la temperatura exterior cae debajo de los 40 F°, se enviara un correo electrónico
+a la lista separada por comas especificada en la opcion "mailto", en este caso
 auser@adomain.com, another@somewhere.com
 
-The example assumes that your SMTP email server is at smtp.mymailserver.com and
-that it uses secure logins. If it does not use secure logins, leave out the
-lines for smtp_user and smtp_password and no login will be attempted.
+El ejemplo asume que su servidor de correo SMTP se encuentra en smtp.mymailserver.com y
+que utiliza un logeo seguro (secure logins). Si esto no fuera asi, deje libres las lines
+para smtp_user y smtp_password y no se intentara ningun logeo de acceso.
 
-Setting an email "from" is optional. If not supplied, one will be filled in, but
-your SMTP server may or may not accept it.
+La configuracion del remitente en el correo es opcional. Si Usted no brinda la misma, una de facto sera instroducida; pero
+su servidor SMTP puede que no la acepte
 
-Setting an email "subject" is optional. If not supplied, one will be filled in.
+La configuracion del valor "asunto" (subjet) en el correo electronico es opcional. Si Usted no brinda la misma, una de facto sera instroducida.
 
-To avoid a flood of emails, one will only be sent every 3600 seconds (one hour).
+Para evitar una catarata de correos electrónicos, se configuró el valor time_wait para que mande uno cada 3600 segundos (una hora).
 
 ********************************************************************************
 
-To specify that this new service be loaded and run, it must be added to the
-configuration option "report_services", located in sub-section [Engine][[Services]].
+Para especificar que este nuevo servicio se cargue y sea ejecutador, se debe agregar el mismo a la
+configuración (weewx.conf) dentro de la seccion de configuración "report_services", localizada en la sub-sección [Engine][[Services]].
 
 [Engine]
   [[Services]]
@@ -46,8 +45,8 @@ configuration option "report_services", located in sub-section [Engine][[Service
 
 ********************************************************************************
 
-If you wish to use both this example and the lowBattery.py example, simply merge
-the two configuration options together under [Alarm] and add both services to
+Si Usted desea usar a la vez este ejemplo de alerta y el ejemplo lowBattery.py, simplemente debera fusionar
+las dos opciones de configuracion bajo [Alarm] y agregar los dos servicios a
 report_services.
 
 ********************************************************************************
@@ -214,5 +213,3 @@ if __name__ == '__main__':
 
     event = weewx.Event(weewx.NEW_ARCHIVE_RECORD, record=rec)
     alarm.newArchiveRecord(event)
-    
-    
