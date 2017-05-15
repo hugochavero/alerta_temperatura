@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright (c) 2016 RAMPBA
 #
 #    Vea el archivo LICENSE.txt para comprender sus derechos.
@@ -41,7 +42,7 @@ configuración (weewx.conf) dentro de la seccion de configuración "report_servi
 [Engine]
   [[Services]]
     ...
-    report_services = weewx.engine.StdPrint, weewx.engine.StdReport, examples.alarm.MyAlarm
+    report_services = weewx.engine.StdPrint, weewx.engine.StdReport, examples.alarm.TempAlarm
 
 ********************************************************************************
 
@@ -63,12 +64,12 @@ from weewx.engine import StdService
 from weeutil.weeutil import timestamp_to_string, option_as_list
 
 # Inherit from the base class StdService:
-class MyAlarm(StdService):
+class TempAlarm(StdService):
     """Custom service that sounds an alarm if an arbitrary expression evaluates true"""
     
     def __init__(self, engine, config_dict):
         # Pass the initialization information on to my superclass:
-        super(MyAlarm, self).__init__(engine, config_dict)
+        super(TempAlarm, self).__init__(engine, config_dict)
         
         # This will hold the time when the last alarm message went out:
         self.last_msg_ts = 0
@@ -77,15 +78,15 @@ class MyAlarm(StdService):
             # Dig the needed options out of the configuration dictionary.
             # If a critical option is missing, an exception will be raised and
             # the alarm will not be set.
-            self.expression    = config_dict['Alarm']['expression']
-            self.time_wait     = int(config_dict['Alarm'].get('time_wait', 3600))
+            self.expression    = config_dict['Alarm']['temp_expression']
+            self.time_wait     = int(config_dict['Alarm']['temp_time_wait'])
             self.smtp_host     = config_dict['Alarm']['smtp_host']
             self.smtp_user     = config_dict['Alarm'].get('smtp_user')
             self.smtp_password = config_dict['Alarm'].get('smtp_password')
             self.SUBJECT       = config_dict['Alarm'].get('subject', "Alarm message from weewx")
             self.FROM          = config_dict['Alarm'].get('from', 'alarm@weewx.com')
             self.TO            = option_as_list(config_dict['Alarm']['mailto'])
-            syslog.syslog(syslog.LOG_INFO, "alarm: Alarm set for expression: '%s'" % self.expression)
+            syslog.syslog(syslog.LOG_INFO, "alarm: Alarm set for temp_expression: '%s'" % self.expression)
             
             # If we got this far, it's ok to start intercepting events:
             self.bind(weewx.NEW_ARCHIVE_RECORD, self.newArchiveRecord)    # NOTE 1
@@ -95,7 +96,7 @@ class MyAlarm(StdService):
             
     def newArchiveRecord(self, event):
         """Gets called on a new archive record event."""
-        
+        syslog.syslog(syslog.LOG_INFO, "TEMPERATURA ----- new Archive Record")
         # To avoid a flood of nearly identical emails, this will do
         # the check only if we have never sent an email, or if we haven't
         # sent one in the last self.time_wait seconds:
@@ -106,12 +107,13 @@ class MyAlarm(StdService):
             # Be prepared to catch an exception in the case that the expression contains 
             # a variable that is not in the record:
             try:                                                              # NOTE 2
+                syslog.syslog(syslog.LOG_INFO, "TEMPERATURA ----- Try eval")
                 # Evaluate the expression in the context of the event archive record.
                 # Sound the alarm if it evaluates true:
                 if eval(self.expression, None, record):                       # NOTE 3
                     # Sound the alarm!
                     # Launch in a separate thread so it doesn't block the main LOOP thread:
-                    t  = threading.Thread(target = MyAlarm.soundTheAlarm, args=(self, record))
+                    t  = threading.Thread(target = TempAlarm.soundTheAlarm, args=(self, record))
                     t.start()
                     # Record when the message went out:
                     self.last_msg_ts = time.time()
@@ -205,7 +207,7 @@ if __name__ == '__main__':
         exit(1)
     
     engine = None
-    alarm = MyAlarm(engine, config_dict)
+    alarm = TempAlarm(engine, config_dict)
     
     rec = {'extraTemp1': 1.0,
            'outTemp'   : 38.2,
@@ -213,3 +215,4 @@ if __name__ == '__main__':
 
     event = weewx.Event(weewx.NEW_ARCHIVE_RECORD, record=rec)
     alarm.newArchiveRecord(event)
+
